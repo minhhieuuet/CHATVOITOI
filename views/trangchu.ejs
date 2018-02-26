@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<script src="socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.js"></script>
+		<title>Trang chu chat</title>
+		<script type="text/javascript">
+
+			var socket=io("http://localhost:8080");
+			//Nhan su kien login fail
+			socket.on("server-send-login-fail",function(){
+					alert("Tên người dùng đã tồn tại");
+			});
+			//Nhan su kien login thanh cong
+			socket.on("server-send-info",function(data){
+				$("#loginForm").hide(1000);
+				$("#chatForm").show(2000);
+				$("#name").html(" "+data);
+			});
+			//Nhan mang user online
+			socket.on("server-send-user-online",function(data){
+					$("#online").html("");
+					data.forEach(function(name){
+						$("#online").append("<div>"+name+"</div>");
+					});
+			});
+			//Nhan ajax user message
+			socket.on("server-send-mess",function(data){
+				$("#messbox").append("<div>"+data.name+" : "+data.mess+"</div>");
+			});
+
+			$(document).ready(function(){
+				$("#loginForm").show();
+				$("#chatForm").hide();
+				//Bat su kien login
+				$("#login").click(function(){
+					socket.emit("client-send-username",$("#username").val());
+				});
+				//Bat su kien gui tin
+				$("#submit").click(function(){
+					socket.emit("client-send-mess",$("#mess").val());
+				});
+				
+			});
+
+		</script>
+	</head>
+
+	<body>
+		<div class="container">
+			<div id="loginForm">
+				<label>Vui lòng nhập tên</label>
+				<input id="username" width="30px" type="text" class="form-control" name="">
+				
+				<button id="login" class="btn btn-success">Vào phòng</button>
+				
+			</div>
+			<div id="chatForm">
+				<label>Chào </label><span id="name">Hiếu</span>
+			<div class="row">
+				<div id="" class="col-sm-2" style="background-color:red; border-radius: 10px 0px 0px 0px;text-align: center; padding:5px;">
+					Đang online
+				</div>
+
+				<div class="col-sm-10" style="background-color:yellow;text-align: center;padding:5px;">
+					Trò chuyện
+				</div>
+			</div>
+				<div class="row">
+					<div id="online" class="col-sm-2" style="background-color:pink; height: 400px;overflow: auto;">
+						
+					</div>
+
+					<div id="messbox" class="col-sm-10"  style="background-color:#f23fff;height: 400px;overflow: auto;">
+					
+					
+
+					</div>
+					
+				</div>
+				<div class="row" style="margin-bottom: 0px;">
+							<div class="col-sm-2"></div>
+							<div class="col-sm-9" style="float: right;" ><input id="mess" type="text" class="form-control" name=""></div>
+							<div class="col-sm-1" style="float: right;"><button id="submit"  style="width: 100%" class="btn btn-success">Gửi</button></div>
+				</div>
+			</div>
+			
+		</div>
+		<div>
+	</body>
+</html>
